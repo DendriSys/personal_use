@@ -34,6 +34,19 @@ class Settings(BaseSettings):
     output_prefix: str = Field(default="outputs/")
     aws_region: str | None = Field(default=os.getenv("AWS_REGION"))
 
+    # Identity registry
+    identities_json: str | None = Field(
+        default=None,
+        description="Inline JSON mapping alias -> {image_s3_uri}",
+    )
+    identities_s3_uri: str | None = Field(
+        default=None,
+        description="S3 URI to JSON mapping alias -> {image_s3_uri}",
+    )
+    allow_identity_registration: bool = Field(default=False)
+    identity_bucket: str | None = Field(default=None)
+    identity_prefix: str = Field(default="identities/")
+
     # Moderation and consent
     require_consent: bool = Field(default=True)
     enable_rekognition: bool = Field(default=False)

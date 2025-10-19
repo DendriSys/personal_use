@@ -9,7 +9,8 @@ import boto3
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--endpoint-name", required=True)
-    p.add_argument("--image-s3-uri", required=True)
+    p.add_argument("--image-s3-uri", default=None)
+    p.add_argument("--identity", default=None)
     p.add_argument("--consent", action="store_true")
     p.add_argument("--num-frames", type=int, default=None)
     p.add_argument("--num-inference-steps", type=int, default=None)
@@ -26,6 +27,7 @@ def main():
 
     payload = {
         "image_s3_uri": args.image_s3_uri,
+        "identity": args.identity,
         "consent": bool(args.consent),
         "num_frames": args.num_frames,
         "num_inference_steps": args.num_inference_steps,

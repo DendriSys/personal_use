@@ -19,6 +19,8 @@ from .s3_utils import (
     derive_output_key,
 )
 from .moderation import analyze_with_rekognition
+from .identity import identity_registry
+from .s3_utils import upload_file_to_s3
 
 app = FastAPI(title="Image-to-Video Service", version="0.1.0")
 
@@ -38,6 +40,7 @@ def ping():
 async def generate(
     image_file: Optional[UploadFile] = File(default=None),
     image_s3_uri: Optional[str] = Form(default=None),
+    identity: Optional[str] = Form(default=None),
     num_frames: Optional[int] = Form(default=None),
     num_inference_steps: Optional[int] = Form(default=None),
     motion_bucket_id: Optional[int] = Form(default=None),
@@ -64,6 +67,11 @@ async def generate(
                 f.write(contents)
         elif image_s3_uri is not None:
             tmp_input_path = download_s3_to_tempfile(image_s3_uri, settings.aws_region)
+        elif identity is not None:
+            ident = identity_registry.get(identity)
+            if not ident:
+                raise HTTPException(status_code=400, detail="Unknown identity alias")
+            tmp_input_path = download_s3_to_tempfile(ident.image_s3_uri, settings.aws_region)
         else:
             raise HTTPException(status_code=400, detail="Provide either image_file or image_s3_uri")
 
@@ -109,6 +117,46 @@ async def generate(
                 pass
 
 
+@app.post("/identities/register")
+async def register_identity(
+    alias: str = Form(...),
+    image_file: Optional[UploadFile] = File(default=None),
+    image_s3_uri: Optional[str] = Form(default=None),
+):
+    if not settings.allow_identity_registration:
+        raise HTTPException(status_code=403, detail="Registration disabled")
+
+    if image_file is None and image_s3_uri is None:
+        raise HTTPException(status_code=400, detail="Provide image_file or image_s3_uri")
+
+    if image_s3_uri is None:
+        # Upload uploaded file to identity bucket
+        if not settings.identity_bucket:
+            raise HTTPException(status_code=500, detail="Identity bucket not configured")
+        contents = await image_file.read()
+        # write to temp, then upload
+        fd, tmp_path = tempfile.mkstemp()
+        os.close(fd)
+        try:
+            with open(tmp_path, "wb") as f:
+                f.write(contents)
+            image_s3_uri = upload_file_to_s3(
+                tmp_path,
+                settings.identity_bucket,
+                settings.identity_prefix,
+                filename=f"{alias}.jpg",
+                region_name=settings.aws_region,
+            )
+        finally:
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+    ident = identity_registry.register(alias, image_s3_uri)
+    return {"alias": ident.alias, "image_s3_uri": ident.image_s3_uri}
+
+
 @app.post("/invocations")
 async def invocations(
     payload: dict = Body(...),
@@ -116,7 +164,7 @@ async def invocations(
     """SageMaker-compatible inference endpoint.
 
     Expected JSON payload keys:
-    - image_s3_uri (preferred) or raw multipart not supported here
+    - image_s3_uri (preferred) or identity alias; raw multipart not supported here
     - consent: bool
     - num_frames, num_inference_steps, motion_bucket_id, noise_aug_strength, fps
     - s3_output_bucket, s3_output_prefix (optional overrides)
@@ -126,8 +174,9 @@ async def invocations(
         raise HTTPException(status_code=400, detail="Consent required to proceed")
 
     image_s3_uri = payload.get("image_s3_uri")
-    if not image_s3_uri:
-        raise HTTPException(status_code=400, detail="image_s3_uri is required for /invocations")
+    identity = payload.get("identity")
+    if not image_s3_uri and not identity:
+        raise HTTPException(status_code=400, detail="Provide image_s3_uri or identity")
 
     num_frames = payload.get("num_frames")
     num_inference_steps = payload.get("num_inference_steps")
@@ -139,7 +188,13 @@ async def invocations(
 
     tmp_input_path = None
     try:
-        tmp_input_path = download_s3_to_tempfile(image_s3_uri, settings.aws_region)
+        if image_s3_uri:
+            tmp_input_path = download_s3_to_tempfile(image_s3_uri, settings.aws_region)
+        else:
+            ident = identity_registry.get(identity)
+            if not ident:
+                raise HTTPException(status_code=400, detail="Unknown identity alias")
+            tmp_input_path = download_s3_to_tempfile(ident.image_s3_uri, settings.aws_region)
         with Image.open(tmp_input_path) as img:
             frames = generate_video_frames(
                 init_image=img,
