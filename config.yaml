@@ -1,0 +1,66 @@
+# Multi-Face LoRA Training and Swapping Configuration
+
+# Face Database: Map names/keywords to face LoRA models
+faces:
+  person1:
+    name: "John"
+    lora_path: "models/lora/john_face.safetensors"
+    reference_images: "data/faces/john/"
+    trigger_word: "j0hn"
+  person2:
+    name: "Jane"
+    lora_path: "models/lora/jane_face.safetensors"
+    reference_images: "data/faces/jane/"
+    trigger_word: "j4ne"
+  # Add more faces as needed
+
+# LoRA Training Settings
+training:
+  base_model: "stabilityai/stable-diffusion-xl-base-1.0"  # or "runwayml/stable-diffusion-v1-5"
+  output_dir: "models/lora/"
+  resolution: 512
+  train_batch_size: 1
+  gradient_accumulation_steps: 4
+  learning_rate: 1e-4
+  lr_scheduler: "constant"
+  max_train_steps: 1000
+  checkpointing_steps: 200
+  rank: 32  # LoRA rank
+  lora_alpha: 32
+  use_8bit_adam: true
+  mixed_precision: "fp16"
+  gradient_checkpointing: true
+  validation_prompt: "portrait photo of {trigger_word}, high quality"
+  validation_epochs: 50
+
+# Face Detection & Recognition
+detection:
+  detection_model: "retinaface"  # or "yolov8face", "mtcnn"
+  detection_threshold: 0.5
+  recognition_model: "arcface"
+  similarity_threshold: 0.6
+  min_face_size: 80
+
+# Face Swapping Settings
+swapping:
+  swap_model: "inswapper"  # or "simswap", "faceswap"
+  blend_method: "seamless"  # or "poisson", "gaussian"
+  face_enhancer: "gfpgan"  # or "codeformer", "none"
+  enhancement_strength: 0.5
+  color_correction: true
+  
+# Video Processing
+video:
+  output_format: "mp4"
+  output_fps: null  # null = use input fps
+  output_quality: 23  # CRF value (lower = better quality)
+  batch_size: 8  # frames to process in parallel
+  temp_frame_dir: "temp_frames/"
+  keep_temp_frames: false
+
+# Paths
+paths:
+  models_dir: "models/"
+  data_dir: "data/"
+  output_dir: "output/"
+  cache_dir: ".cache/"
