@@ -1,0 +1,5 @@
+# Models directory
+# Place your downloaded models here:
+# - inswapper_128.onnx (face swap model)
+# - GFPGANv1.4.pth (face enhancement model)
+# - Trained LoRA models will be saved to models/lora/
