@@ -5,7 +5,7 @@ Phone: +91-9454957337  |  Email: vishalgautam2706@gmail.com  |  LinkedIn: https:
 Location: Noida, India
 
 SUMMARY
-- Senior Technical Lead (UPI) managing a 4-engineer team; ~5 years building and operating high-scale payments platforms.
+- Senior Technical Lead (UPI) managing a 4-engineer team; ~6+ years building and operating high-scale payments platforms.
 - Led multi-PSP architecture and migration (~50M users) with high availability and zero customer disruption.
 - Proven record of reducing latency and cost at scale: 50–60% API latency drop at ~5,500 TPS; hot-tier storage cut from 2,000 TB to 100 TB (~$170K → ~$9K per month).
 - Deep experience with Java, Spring Boot, Kafka, Aerospike, MySQL, caching, resiliency patterns, and production observability.

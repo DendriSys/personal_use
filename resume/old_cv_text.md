@@ -4,7 +4,7 @@
 - Mail: vishalgautam2706@gmail.com
 - LinkedIn: www.linkedin.com/in/vishal-gautam-71a bb014
 
-## WORK EXPERIENCE | ~ 5.0 Years
+## WORK EXPERIENCE | ~ 6+ Years
 
 ### Technical Lead / One97 Communication India Limited (Paytm), Noida, India
 
