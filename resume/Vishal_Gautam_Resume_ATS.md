@@ -1,11 +1,11 @@
 Vishal Gautam
-Technical Lead • Backend Engineering • UPI Payments
+Senior Technical Lead • Backend Engineering • UPI Payments
 
 Phone: +91-9454957337  |  Email: vishalgautam2706@gmail.com  |  LinkedIn: https://www.linkedin.com/in/vishal-gautam-71a-bb014
 Location: Noida, India
 
 SUMMARY
-- Backend/Payments engineer with ~5 years building and operating high-scale UPI platforms.
+- Senior Technical Lead (UPI) managing a 4-engineer team; ~5 years building and operating high-scale payments platforms.
 - Led multi-PSP architecture and migration (~50M users) with high availability and zero customer disruption.
 - Proven record of reducing latency and cost at scale: 50–60% API latency drop at ~5,500 TPS; hot-tier storage cut from 2,000 TB to 100 TB (~$170K → ~$9K per month).
 - Deep experience with Java, Spring Boot, Kafka, Aerospike, MySQL, caching, resiliency patterns, and production observability.
@@ -19,8 +19,9 @@ CORE SKILLS
 - Concepts: Distributed Systems, Caching Strategies, Data Structures & Algorithms, OOP, DBMS
 
 EXPERIENCE
-One97 Communications Ltd. (Paytm) — Technical Lead (UPI)
+One97 Communications Ltd. (Paytm) — Senior Technical Lead (UPI)
 Noida, India • 2019 – Present
+- Lead a 4-engineer team; plan sprints, conduct code reviews, mentor engineers, and drive on-schedule delivery across UPI services.
 - Designed and led rollout of a multi-PSP model for the Paytm app, migrating ~50M users from the legacy bank system to the new architecture with no customer-impacting downtime.
 - Implemented an Aerospike-backed UPI user-profile cache, reducing API latencies by 50–60% while sustaining ~5,500 TPS.
 - Drove a cost-optimization charter for UPI:
